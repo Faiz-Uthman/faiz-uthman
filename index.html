@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Climbing Color Match</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            display: flex;
+            width: 900px;
+            height: 600px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+        
+        .menu-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            color: white;
+        }
+        
+        .menu-title {
+            font-size: 48px;
+            margin-bottom: 40px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .difficulty-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+            width: 300px;
+        }
+        
+        .difficulty-btn {
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .difficulty-btn:hover {
+            transform: translateY(-3px);
+        }
+        
+        .easy-btn {
+            background: #2ed573;
+            color: white;
+        }
+        
+        .medium-btn {
+            background: #ffa502;
+            color: white;
+        }
+        
+        .hard-btn {
+            background: #ff4757;
+            color: white;
+        }
+        
+        .settings-btn {
+            padding: 12px 25px;
+            background: #3742fa;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            margin-top: 20px;
+        }
+        
+        .settings-btn:hover {
+            background: #5352ed;
+            transform: translateY(-2px);
+        }
+        
+        .settings-panel {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 350px;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            z-index: 300;
+            display: none;
+        }
+        
+        .settings-title {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        
+        .volume-control {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .volume-label {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .volume-adjust {
+            display: flex;
+            align-items: center;
+        }
+        
+        .volume-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: none;
+            background: #3742fa;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .volume-value {
+            margin: 0 10px;
+            width: 40px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .close-settings {
+            display: block;
+            margin: 20px auto 0;
+            padding: 10px 20px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        
+        .left-panel {
+            flex: 1;
+            background: linear-gradient(to bottom, #4facfe 0%, #00f2fe 100%);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            border-right: 3px dashed #333;
+        }
+        
+        .right-panel {
+            flex: 1;
+            background: linear-gradient(to bottom, #ffecd2 0%, #fcb69f 100%);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .game-title {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 24px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .climbing-area {
+            width: 100px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50px;
+            position: relative;
+            overflow: hidden;
+            border: 3px solid #2c3e50;
+        }
+        
+        .rope {
+            position: absolute;
+            width: 6px;
+            height: 100%;
+            background: linear-gradient(to bottom, #8e6e53, #6d4c41);
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .marker {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+        
+        .boy {
+            position: absolute;
+            font-size: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: bottom 0.5s ease;
+            z-index: 10;
+        }
+        
+        .lobster {
+            position: absolute;
+            font-size: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: bottom 0.5s ease;
+            z-index: 5;
+        }
+        
+        .color-display {
+            width: 80%;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 32px;
+            font-weight: bold;
+            margin: 20px 0;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            background: white;
+            color: #000;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        
+        .color-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 80%;
+        }
+        
+        .color-option {
+            height: 60px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .color-option:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .color-option:active {
+            transform: translateY(1px);
+        }
+        
+        .feedback {
+            position: absolute;
+            font-size: 24px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+        
+        .score-board {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .game-over {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 48px;
+            font-weight: bold;
+            z-index: 100;
+            display: none;
+        }
+        
+        .victory-animation {
+            font-size: 80px;
+            animation: victorySpin 1.5s infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes victorySpin {
+            0% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.2) rotate(180deg); }
+            100% { transform: scale(1) rotate(360deg); }
+        }
+        
+        .restart-btn {
+            margin-top: 20px;
+            padding: 12px 25px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .menu-btn {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: #3742fa;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .restart-btn:hover, .menu-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .instructions {
+            margin-top: 20px;
+            text-align: center;
+            color: #2c3e50;
+            font-size: 14px;
+            padding: 0 10px;
+        }
+        
+        .danger-close {
+            animation: pulse 0.8s infinite alternate;
+        }
+        
+        @keyframes pulse {
+            from { transform: translateX(-50%) scale(1); }
+            to { transform: translateX(-50%) scale(1.1); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+        
+        .timer-display {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 18px;
+        }
+        
+        /* Back button notification */
+        .back-button-notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            z-index: 1000;
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="menu-screen" id="menu-screen">
+            <h1 class="menu-title">Color Climb Challenge</h1>
+            <div class="difficulty-options">
+                <button class="difficulty-btn easy-btn" onclick="startGame('easy')">Easy</button>
+                <button class="difficulty-btn medium-btn" onclick="startGame('medium')">Medium</button>
+                <button class="difficulty-btn hard-btn" onclick="startGame('hard')">Hard</button>
+            </div>
+            <button class="settings-btn" onclick="showSettings()">Settings</button>
+        </div>
+        
+        <div class="settings-panel" id="settings-panel">
+            <h2 class="settings-title">Audio Settings</h2>
+            <div class="volume-control">
+                <span class="volume-label">Background Music:</span>
+                <div class="volume-adjust">
+                    <button class="volume-btn" onclick="adjustVolume('bgm', -10)">-</button>
+                    <span class="volume-value" id="bgm-volume">50%</span>
+                    <button class="volume-btn" onclick="adjustVolume('bgm', 10)">+</button>
+                </div>
+            </div>
+            <div class="volume-control">
+                <span class="volume-label">Sound Effects:</span>
+                <div class="volume-adjust">
+                    <button class="volume-btn" onclick="adjustVolume('sfx', -10)">-</button>
+                    <span class="volume-value" id="sfx-volume">50%</span>
+                    <button class="volume-btn" onclick="adjustVolume('sfx', 10)">+</button>
+                </div>
+            </div>
+            <button class="close-settings" onclick="hideSettings()">Close</button>
+        </div>
+        
+        <div class="left-panel">
+            <h2 class="game-title">Hurry Up!</h2>
+            <div class="climbing-area">
+                <div class="rope"></div>
+                <div class="marker" style="bottom: 380px;">Finish</div>
+                <div class="marker" style="bottom: 0px;">Start</div>
+                <div class="boy" id="boy">🕺</div>
+                <div class="lobster" id="lobster">🦞</div>
+            </div>
+            <div class="score-board">
+                <div>Boy: <span id="boy-score">0</span>/20</div>
+                <div>Lobster: <span id="lobster-score">0</span>/20</div>
+            </div>
+            <div class="timer-display" id="timer-display">Lobster ascends in: 0s</div>
+        </div>
+        
+        <div class="right-panel">
+            <h2 class="game-title">Match the Color!</h2>
+            <div class="color-display" id="color-text">Yellow</div>
+            <div class="color-options" id="color-options">
+                <!-- Color options will be generated here -->
+            </div>
+            <div class="instructions">
+                <p>Click the box that matches the color text.<br>
+                Correct: Boy climbs 1 step.<br>
+                Wrong: Lobster climbs 4 steps!</p>
+            </div>
+        </div>
+        
+        <div class="game-over" id="game-over">
+            <div class="victory-animation" id="victory-animation">🎉</div>
+            <div id="game-result">You Win!</div>
+            <button class="restart-btn" onclick="restartGame()">Play Again</button>
+            <button class="menu-btn" onclick="returnToMenu()">Main Menu</button>
+        </div>
+    </div>
+
+    <!-- Back button notification -->
+    <div class="back-button-notification" id="back-button-notification">
+        Press back again to return to menu
+    </div>
+
+    <script>
+        // Game variables
+        const boy = document.getElementById('boy');
+        const lobster = document.getElementById('lobster');
+        const colorText = document.getElementById('color-text');
+        const colorOptions = document.getElementById('color-options');
+        const boyScore = document.getElementById('boy-score');
+        const lobsterScore = document.getElementById('lobster-score');
+        const gameOver = document.getElementById('game-over');
+        const gameResult = document.getElementById('game-result');
+        const menuScreen = document.getElementById('menu-screen');
+        const settingsPanel = document.getElementById('settings-panel');
+        const victoryAnimation = document.getElementById('victory-animation');
+        const timerDisplay = document.getElementById('timer-display');
+        const backButtonNotification = document.getElementById('back-button-notification');
+        
+        let boyPosition = 0;
+        let lobsterPosition = -4; // Start 4 units lower than the boy
+        let gameActive = true;
+        let currentCorrectColor = null;
+        let difficulty = 'medium';
+        let lobsterTimer = null;
+        let timeUntilLobsterAscends = 0;
+        
+        // Back button handling variables
+        let backButtonPressedOnce = false;
+        let backButtonTimeout = null;
+        
+        // Volume settings
+        let volumes = {
+            bgm: 50,
+            sfx: 50
+        };
+        
+        // Sound variables - Replace these with your actual sound file paths
+        const correctSound = "correct-sound.mp3";
+        const wrongSound = "wrong-sound.mp3";
+        const winSound = "win-sound.mp3";
+        const loseSound = "lose-sound.mp3";
+        const bgMusic = "background-music.mp3";
+        
+        // Colors for the game
+        const colors = [
+            { name: 'Red', value: '#ff4757' },
+            { name: 'Blue', value: '#3742fa' },
+            { name: 'Green', value: '#2ed573' },
+            { name: 'Yellow', value: '#ffa502' },
+            { name: 'Purple', value: '#a55eea' },
+            { name: 'Orange', value: '#ff9f43' },
+            { name: 'Pink', value: '#fd79a8' },
+            { name: 'Brown', value: '#a0522d' },
+            { name: 'Cyan', value: '#00d2d3' },
+            { name: 'Lime', value: '#7bed9f' }
+        ];
+        
+        // Function to play sounds with volume adjustment
+        function playSound(soundFile, type) {
+            // In your app builder, use the appropriate method to play sounds with volume control
+            // For example: 
+            // AudioPlayer.play(soundFile, volumes[type]);
+            console.log("Playing " + soundFile + " at volume " + volumes[type] + "%");
+        }
+        
+        // Start the game with selected difficulty
+        function startGame(selectedDifficulty) {
+            difficulty = selectedDifficulty;
+            menuScreen.style.display = 'none';
+            initGame();
+            
+            // Play background music
+            playSound(bgMusic, 'bgm');
+        }
+        
+        // Return to main menu
+        function returnToMenu() {
+            clearInterval(lobsterTimer);
+            gameOver.style.display = 'none';
+            menuScreen.style.display = 'flex';
+            resetBackButtonHandler();
+        }
+        
+        // Show settings panel
+        function showSettings() {
+            settingsPanel.style.display = 'block';
+        }
+        
+        // Hide settings panel
+        function hideSettings() {
+            settingsPanel.style.display = 'none';
+        }
+        
+        // Adjust volume
+        function adjustVolume(type, change) {
+            volumes[type] = Math.max(0, Math.min(100, volumes[type] + change));
+            document.getElementById(`${type}-volume`).textContent = volumes[type] + '%';
+            
+            // If adjusting background music volume, update the playing music volume
+            if (type === 'bgm') {
+                // Update background music volume in your app builder
+            }
+        }
+        
+        // Initialize game
+        function initGame() {
+            boyPosition = 0;
+            lobsterPosition = -4;
+            gameActive = true;
+            updatePositions();
+            generateColorOptions();
+            gameOver.style.display = 'none';
+            victoryAnimation.style.display = 'block';
+            lobster.classList.remove('danger-close');
+            
+            // Set up back button handler
+            setupBackButtonHandler();
+            
+            // Set up lobster auto-ascend based on difficulty
+            clearInterval(lobsterTimer);
+            
+            let interval;
+            switch(difficulty) {
+                case 'easy':
+                    interval = 8000; // 8 seconds
+                    break;
+                case 'medium':
+                    interval = 5000; // 5 seconds
+                    break;
+                case 'hard':
+                    interval = 3000; // 3 seconds
+                    break;
+            }
+            
+            timeUntilLobsterAscends = interval / 1000;
+            updateTimerDisplay();
+            
+            lobsterTimer = setInterval(() => {
+                if (gameActive) {
+                    lobsterPosition++;
+                    updatePositions();
+                    timeUntilLobsterAscends = interval / 1000;
+                    updateTimerDisplay();
+                }
+            }, interval);
+            
+            // Update timer display every second
+            setInterval(() => {
+                if (gameActive) {
+                    timeUntilLobsterAscends--;
+                    if (timeUntilLobsterAscends <= 0) {
+                        timeUntilLobsterAscends = interval / 1000;
+                    }
+                    updateTimerDisplay();
+                }
+            }, 1000);
+        }
+        
+        // Update timer display
+        function updateTimerDisplay() {
+            timerDisplay.textContent = `Lobster ascends in: ${timeUntilLobsterAscends}s`;
+        }
+        
+        // Update positions of boy and lobster
+        function updatePositions() {
+            boy.style.bottom = boyPosition * 20 + 'px';
+            lobster.style.bottom = lobsterPosition * 20 + 'px';
+            boyScore.textContent = boyPosition;
+            lobsterScore.textContent = Math.max(0, lobsterPosition);
+            
+            // Add visual warning when lobster is getting close
+            if (boyPosition - lobsterPosition <= 5 && boyPosition - lobsterPosition > 0) {
+                lobster.classList.add('danger-close');
+            } else {
+                lobster.classList.remove('danger-close');
+            }
+            
+            // Check win/lose conditions
+            if (boyPosition >= 20) {
+                // Play win sound
+                playSound(winSound, 'sfx');
+                clearInterval(lobsterTimer);
+                endGame('You Win!');
+            } else if (lobsterPosition >= boyPosition) {
+                // Play lose sound
+                playSound(loseSound, 'sfx');
+                clearInterval(lobsterTimer);
+                // Player loses if lobster reaches the same level or higher
+                lobsterPosition = boyPosition - 1;
+                updatePositions();
+                endGame('You Lose!');
+            }
+        }
+        
+        // Generate color options
+        function generateColorOptions() {
+            // Clear previous options
+            colorOptions.innerHTML = '';
+            
+            // Shuffle colors and pick 5
+            const shuffledColors = [...colors].sort(() => Math.random() - 0.5);
+            const selectedColors = shuffledColors.slice(0, 5);
+            
+            // Set the color text to one of the selected colors
+            currentCorrectColor = selectedColors[Math.floor(Math.random() * selectedColors.length)];
+            colorText.textContent = currentCorrectColor.name;
+            
+            // Create color option boxes
+            selectedColors.sort(() => Math.random() - 0.5).forEach(color => {
+                const colorOption = document.createElement('div');
+                colorOption.className = 'color-option';
+                colorOption.style.backgroundColor = color.value;
+                colorOption.dataset.name = color.name;
+                
+                colorOption.addEventListener('click', handleColorSelection);
+                
+                colorOptions.appendChild(colorOption);
+            });
+        }
+        
+        // Handle color selection
+        function handleColorSelection(e) {
+            if (!gameActive) return;
+            
+            const selectedOption = e.currentTarget;
+            const selectedColor = selectedOption.dataset.name;
+            
+            // Disable all options to prevent further clicks during feedback
+            const allOptions = document.querySelectorAll('.color-option');
+            allOptions.forEach(option => {
+                option.style.pointerEvents = 'none';
+            });
+            
+            if (selectedColor === currentCorrectColor.name) {
+                // Play correct sound
+                playSound(correctSound, 'sfx');
+                
+                // Correct match
+                showFeedback(selectedOption, '✔️');
+                
+                // Boy moves up after a short delay
+                setTimeout(() => {
+                    boyPosition++;
+                    updatePositions();
+                    
+                    // Generate new options if game is still active
+                    if (gameActive) {
+                        generateColorOptions();
+                    }
+                }, 1000);
+            } else {
+                // Play wrong sound
+                playSound(wrongSound, 'sfx');
+                
+                // Wrong match
+                showFeedback(selectedOption, '❌');
+                
+                // Find and show the correct option
+                const correctOption = Array.from(allOptions).find(
+                    option => option.dataset.name === currentCorrectColor.name
+                );
+                showFeedback(correctOption, '✔️');
+                
+                // Lobster moves up after a short delay
+                setTimeout(() => {
+                    lobsterPosition += 4;
+                    updatePositions();
+                    
+                    // Generate new options if game is still active
+                    if (gameActive) {
+                        generateColorOptions();
+                    }
+                }, 1000);
+            }
+        }
+        
+        // Show feedback on a color option
+        function showFeedback(element, symbol) {
+            const feedback = document.createElement('div');
+            feedback.className = 'feedback';
+            feedback.textContent = symbol;
+            feedback.style.animation = 'fadeIn 0.3s forwards';
+            element.appendChild(feedback);
+        }
+        
+        // End game
+        function endGame(result) {
+            gameActive = false;
+            gameResult.textContent = result;
+            
+            // Hide victory animation if player lost
+            if (result === 'You Lose!') {
+                victoryAnimation.style.display = 'none';
+            }
+            
+            gameOver.style.display = 'flex';
+        }
+        
+        // Restart game
+        function restartGame() {
+            initGame();
+        }
+        
+        // Handle back button press
+        function handleBackButton() {
+            // If menu is already visible, let the default back button behavior happen
+            if (menuScreen.style.display === 'flex') {
+                return true;
+            }
+            
+            // If settings panel is open, close it instead
+            if (settingsPanel.style.display === 'block') {
+                hideSettings();
+                return false;
+            }
+            
+            // If game over screen is visible, return to menu
+            if (gameOver.style.display === 'flex') {
+                returnToMenu();
+                return false;
+            }
+            
+            // If in game, handle double press to exit
+            if (!backButtonPressedOnce) {
+                // First press - show notification
+                backButtonPressedOnce = true;
+                backButtonNotification.style.display = 'block';
+                
+                // Hide notification after 2 seconds
+                backButtonTimeout = setTimeout(() => {
+                    backButtonPressedOnce = false;
+                    backButtonNotification.style.display = 'none';
+                }, 2000);
+                
+                return false;
+            } else {
+                // Second press - return to menu
+                clearTimeout(backButtonTimeout);
+                backButtonPressedOnce = false;
+                backButtonNotification.style.display = 'none';
+                returnToMenu();
+                return false;
+            }
+        }
+        
+        // Set up back button handler
+        function setupBackButtonHandler() {
+            backButtonPressedOnce = false;
+            if (backButtonTimeout) {
+                clearTimeout(backButtonTimeout);
+            }
+            backButtonNotification.style.display = 'none';
+            
+            // Add event listener for back button
+            document.addEventListener('backbutton', onBackButton, false);
+        }
+        
+        // Reset back button handler
+        function resetBackButtonHandler() {
+            backButtonPressedOnce = false;
+            if (backButtonTimeout) {
+                clearTimeout(backButtonTimeout);
+            }
+            backButtonNotification.style.display = 'none';
+            
+            // Remove event listener for back button
+            document.removeEventListener('backbutton', onBackButton, false);
+        }
+        
+        // Back button event handler
+        function onBackButton(e) {
+            e.preventDefault();
+            if (!handleBackButton()) {
+                // If we're handling the back button, prevent default behavior
+                e.stopPropagation();
+                return false;
+            }
+        }
+        
+        // Initialize the game with menu screen
+        resetBackButtonHandler();
+    </script>
+</body>
+</html>
